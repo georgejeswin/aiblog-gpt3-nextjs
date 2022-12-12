@@ -9,7 +9,7 @@ const openai = new OpenAIApi(configuration);
 const api = async (req: NextApiRequest, res: NextApiResponse) => {
   const completion = await openai.createCompletion({
     model: "text-davinci-003",
-    prompt: req.body.question.subject,
+    prompt: `Write a blog about ${req.body.question.subject}`,
     temperature: 0.6,
     max_tokens: 2048,
     // stream: true

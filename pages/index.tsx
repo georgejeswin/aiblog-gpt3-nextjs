@@ -3,16 +3,22 @@ import { FormEvent, useState } from "react";
 import styles from "../styles/Home.module.css";
 
 export default function Home() {
-  const [questionInput, setQuestionInput] = useState({
+  const [questionInput, setQuestionInput] = useState<{
+    subject: string;
+    images: boolean;
+    imagesLength: number;
+  }>({
     subject: "",
     images: false,
     imagesLength: 0,
   });
-  const [result, setResult] = useState();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [result, setResult] = useState<string>("");
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    console.log("input", questionInput);
     event.preventDefault();
+    setLoading(true);
+    setResult("");
     const response = await fetch("/api/gpt3", {
       method: "POST",
       headers: {
@@ -21,6 +27,7 @@ export default function Home() {
       body: JSON.stringify({ question: questionInput }),
     });
     const data = await response.json();
+    setLoading(false);
     setResult(data.result);
     setQuestionInput({
       subject: "",
@@ -44,6 +51,7 @@ export default function Home() {
             name="animal"
             placeholder="Enter your subject"
             value={questionInput.subject}
+            required
             onChange={(e) =>
               setQuestionInput({ ...questionInput, subject: e.target.value })
             }
@@ -51,8 +59,8 @@ export default function Home() {
 
           <input
             type="submit"
-            value="Create"
-            // disabled={!questionInput.length}
+            value={loading ? "Creating..." : "Create"}
+            disabled={!questionInput.subject.length}
           />
         </form>
         <div className={styles.result}>{result}</div>
